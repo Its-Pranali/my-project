@@ -178,24 +178,24 @@
                     name: 'email',
                 },
                 {
-                    data: 'username',
-                    name: 'username',
+                    data: 'user_name',
+                    name: 'user_name',
                 },
                 {
-                    data: 'role',
-                    name: 'role',
+                    data: 'r_name',
+                    name: 'r.role_name',
                 },
                 {
-                    data: 'department',
-                    name: 'department',
+                    data: 'dept_name',
+                    name: 'd.department_name',
                 },
                 {
-                    data: 'subdepartment',
-                    name: 'subdepartment',
+                    data: 's_dept',
+                    name: 'sub_dept.subdepartment_name',
                 },
                 {
                     data: 'taluka',
-                    name: 'taluka',
+                    name: 't.taluka_name',
                 },
                 {
                     data: 'status',
@@ -231,10 +231,10 @@
         var role_name = $("#role_name").val();
         var department_name = $("#department_name").val();
         var subdepartment_name = $("#subdepartment_name").val();
-        var taluka_name = $("#mobile_no").val();
+        var taluka_name = $("#taluka_name").val();
         var status = $("#status").val();
 
-        var form= $("addEditUserForm")[0];
+        var form= $("#addEditUserForm")[0];
         var formData=new FormData(form);
 
         var url;
@@ -252,19 +252,21 @@
             processData:false,
             contentType:false,
             data:formData,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name=csrf-token]').attr('content')
-            },
             dataType:"Json",
             success:function(data){
                if(data.status){
-                alert(data.message);
+                swal.fire("success",data.message,"success");
+                $('#addEditUserModal').modal('hide');
+                $('#userTable').DataTable().ajax.reload();
                }
                else{
-                alert(data.message);
+                swal.fire("error",data.message,"error");
                }
+            },
+            error:function(jqXHR,textStatus,errorThrown){
+                swal.fire("error","Error adding/updating data","error");
             }
-        })
+        });
     }
 </script>
 

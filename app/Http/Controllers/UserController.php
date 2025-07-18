@@ -24,15 +24,23 @@ class UserController extends Controller
     public function userDatatable(Request $request)
     {
         if (request()->ajax()) {
-            return datatables()->of(UserDetails::select('id', 'name', 'mobile_no', 'email', 'user_name', 'role_name', 'department_name', 'subdepartment_name', 'taluka_name', 'status', 'created_at', 'updated_at', 'deleted_at'))
+            // return datatables()->of(UserDetails::select('id', 'name', 'mobile_no', 'email', 'user_name', 'role_name', 'department_name', 'subdepartment_name', 'taluka_name', 'status', 'created_at', 'updated_at', 'deleted_at'))
+            //     ->editColumn('created_at', function ($request) {
+            //         return $request->created_at->format('d-m-Y H:i');
+            //     })
+            return datatables()->of(UserDetails::join('roles as r','r.id','=','user_details.role_name')
+                ->join('departments as d','d.id','=','user_details.department_name')
+                ->join('subdepartments as sub_dept','sub_dept.id','=','user_details.subdepartment_name')
+                ->join('talukas as t','t.id','=','user_details.taluka_name')
+                ->select('user_details.id', 'user_details.name', 'user_details.mobile_no', 'user_details.email', 'user_details.user_name', 'user_details.role_name', 'user_details.department_name', 'user_details.subdepartment_name', 'user_details.taluka_name', 'user_details.status', 'user_details.created_at', 'user_details.updated_at', 'user_details.deleted_at','r.role_name as r_name','d.department_name as dept_name','sub_dept.subdepartment_name as s_dept','t.taluka_name as taluka'))
                 ->editColumn('created_at', function ($request) {
-                    return $request->created_at->frmat('d-m-Y H:i');
+                    return $request->created_at->format('d-m-Y H:i');
                 })
                 ->order(function ($query) {
-                    $query->orderBy('id', 'desc');
+                    $query->orderBy('id', 'asc');
                 })
                 ->addColumn('action', function ($row) {
-                    $btn = "<a title='Edit User' onClick=editUser($row->id) class='btn btn-primary btn-sm'><i></i></a>";
+                    $btn = "<a title='Edit User' onClick=editUser($row->id) class='btn btn-primary btn-sm'><i class='fa fa-edit text-light'></i></a> <a title='Edit User' onClick=editUser($row->id) class='btn btn-primary btn-sm'><i class='fa fa-trash' aria-hidden='true'></i></a>";
                     return $btn;
                 })
                 ->rawColumns(['action'])

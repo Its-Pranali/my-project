@@ -29,7 +29,7 @@ class TalukaController extends Controller
                 })
                 ->rawColumns(['action'])
                 ->addIndexColumn()
-                ->make(true);
+                ->make(true);  
         }
     }
     public function saveTalukaDetails(Request $request)
