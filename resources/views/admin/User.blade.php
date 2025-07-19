@@ -109,11 +109,8 @@
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="subdepartment_name" class="form-label">Select SubDepartment</label>
-                                    <select name="subdepartment_name" id="subdepartment_name" class="form-control">
-                                        <option value="">Select Subdepartment</option>
-                                        @foreach($data['subdepartment'] as $key=>$sub_dept)
-                                        <option value="{{ $sub_dept['id'] }}">{{ $sub_dept['subdepartment_name'] }}</option>
-                                        @endforeach
+                                    <select name="subdepartment_name[]" id="subdepartment_name" class="form-control">
+
                                     </select>
                                 </div>
                                 <div class="col-md-6 form-group">
@@ -213,7 +210,34 @@
                     name: 'action',
                 },
             ]
-        })
+        });
+        $('#department_name').on('change', function() {
+            var id = $(this).val();
+
+            if (id) {
+                $.ajax({
+                    url: "{{ url('/getSubdepartments') }}",
+                    type: "POST",
+                    data: {
+                        id: id,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(data) {
+                        $('#subdepartment_name').empty();
+                        $('#subdepartment_name').append('<option value="">Select Subdepartment</option>');
+                        $.each(data, function(key, value) {
+                            $('#subdepartment_name').append('<option value="' + value.id + '">' + value.subdepartment_name + '</option>');
+                        });
+                    },
+                    error: function(xhr) {
+                        console.log("Error loading subdepartments");
+                    }
+                });
+            } else {
+                $('#subdepartment_name').empty();
+                $('#subdepartment_name').append('<option value="">Select Subdepartment</option>');
+            }
+        });
     });
 
     function addUser(id) {
@@ -234,37 +258,65 @@
         var taluka_name = $("#taluka_name").val();
         var status = $("#status").val();
 
-        var form= $("#addEditUserForm")[0];
-        var formData=new FormData(form);
+        var form = $("#addEditUserForm")[0];
+        var formData = new FormData(form);
 
         var url;
-        if(save_method=='add'){
-            url="saveUserDetails";
-            var msg="New user has been saved successfully";
-        }
-        else{
-            url="";
-            var msg="user has been updated successfully";
+        if (save_method == 'add') {
+            url = "saveUserDetails";
+            var msg = "New user has been saved successfully";
+        } else {
+            url = "";
+            var msg = "user has been updated successfully";
         }
         $.ajax({
-            url:url,
-            type:"POST",
-            processData:false,
-            contentType:false,
-            data:formData,
-            dataType:"Json",
+            url: url,
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: formData,
+            dataType: "Json",
+            success: function(data) {
+                if (data.status) {
+                    swal.fire("success", data.message, "success");
+                    $('#addEditUserModal').modal('hide');
+                    $('#userTable').DataTable().ajax.reload();
+                } else {
+                    swal.fire("error", data.message, "error");
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                swal.fire("error", "Error adding/updating data", "error");
+            }
+        });
+    }
+
+    function editUser(id){
+        save_method='update';
+        $('modal-tilte').text("Edit User");
+        $("#addEditUserForm")[0].reset();
+        $.ajax({
+            url:"editUserDetails",
+            type:POST,
+            headers:{
+                'X-CSRF-TOKEN':"{{ csrf_token() }}"
+            },
+            data:btoa(id),
+            dataType:"JSON",
             success:function(data){
-               if(data.status){
-                swal.fire("success",data.message,"success");
-                $('#addEditUserModal').modal('hide');
-                $('#userTable').DataTable().ajax.reload();
-               }
-               else{
-                swal.fire("error",data.message,"error");
-               }
+                $("#id").val(data.message.id);
+                $("#name").val(data.message.name);
+                $("#mobile_no").val(data.message.mobile_no);
+                $("#email").val(data.message.email);
+                $("#user_name").val(data.message.user_name);
+                $("#role_name").val(data.message.role_name);
+                $("#department_name").val(data.message.department_name);
+                $("#subdepartment_name").val(data.message.subdepartment_name);
+                $("#taluka_name").val(data.message.taluka_name);
+                $("#status").val(data.message.status);
             },
             error:function(jqXHR,textStatus,errorThrown){
-                swal.fire("error","Error adding/updating data","error");
+                alert("Error get data from ajax");
             }
         });
     }

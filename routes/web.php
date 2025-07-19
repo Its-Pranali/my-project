@@ -87,3 +87,4 @@ Route::post("/deleteSubdepartmentDetails",[SubdepartmentController::class,"delet
 Route::get("/user",[UserController::class,"user"]);
 Route::get("/userDatatable",[UserController::class,"userDatatable"]);
 Route::post("/saveUserDetails",[UserController::class,"saveUserDetails"]);
+Route::post('/getSubdepartments', [UserController::class, 'getSubdepartments']);
