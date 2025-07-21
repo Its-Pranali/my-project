@@ -9,6 +9,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\SubdepartmentController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ModuleController;
 
 Route::get('/', function () {
     return view('Dashboard');
@@ -91,3 +92,10 @@ Route::post('/getSubdepartments', [UserController::class, 'getSubdepartments']);
 Route::post('/editUserDetails', [UserController::class, 'editUserDetails']);
 Route::post('/updateUser', [UserController::class, 'updateUser']);
 Route::post('/deleteUserDetails', [UserController::class, 'deleteUserDetails']);
+
+
+
+// Route for module
+
+Route::get("/module",[ModuleController::class,"module"]);
+Route::get("/moduleDatatable",[ModuleController::class,"moduleDatatable"]);

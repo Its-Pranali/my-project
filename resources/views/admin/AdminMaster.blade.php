@@ -181,6 +181,29 @@
                 </div>
             </div>
 
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <a href="{{ url('module') }}">
+                            <div class="master-heading">
+                                <div class="col-12">
+                                    <div class="row justify-content-between align-items-center">
+                                        <div class="col-md-10 p-0">
+                                            <h5 class="mb-0">Add Module</h5>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <h2 class="m-b-0 text-right">
+                                                <i class="fa-solid fa-briefcase text-primary"></i>
+                                            </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
 
         </div>
     </div>
