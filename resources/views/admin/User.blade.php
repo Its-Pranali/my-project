@@ -72,6 +72,7 @@
                         <form class="addEditUserForm" id="addEditUserForm" method="POST">
                             @csrf
                             <div class="row">
+                                <input type="hidden" id="id" name="id">
                                 <div class="col-md-6 form-group">
                                     <label for="name" class="form-label">Full Name</label>
                                     <input type="text" name="name" id="name" class="form-control">
@@ -109,8 +110,7 @@
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="subdepartment_name" class="form-label">Select SubDepartment</label>
-                                    <select name="subdepartment_name[]" id="subdepartment_name" class="form-control">
-
+                                    <select name="subdepartment_name" id="subdepartment_name" class="form-control">
                                     </select>
                                 </div>
                                 <div class="col-md-6 form-group">
@@ -138,6 +138,7 @@
                         <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-primary btn-sm" onclick="saveUser()">Save</button>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -266,7 +267,7 @@
             url = "saveUserDetails";
             var msg = "New user has been saved successfully";
         } else {
-            url = "";
+            url = "updateUser";
             var msg = "user has been updated successfully";
         }
         $.ajax({
@@ -291,32 +292,93 @@
         });
     }
 
-    function editUser(id){
-        save_method='update';
-        $('modal-tilte').text("Edit User");
+    function editUser(id) {
+        save_method = 'update';
+        $(".modal-title").text("Edit User");
         $("#addEditUserForm")[0].reset();
         $.ajax({
-            url:"editUserDetails",
-            type:POST,
-            headers:{
-                'X-CSRF-TOKEN':"{{ csrf_token() }}"
+            url: "editUserDetails",
+            type: "POST",
+            headers: {
+                'X-CSRF-TOKEN': "{{ csrf_token() }}"
             },
-            data:btoa(id),
-            dataType:"JSON",
-            success:function(data){
-                $("#id").val(data.message.id);
-                $("#name").val(data.message.name);
-                $("#mobile_no").val(data.message.mobile_no);
-                $("#email").val(data.message.email);
-                $("#user_name").val(data.message.user_name);
-                $("#role_name").val(data.message.role_name);
-                $("#department_name").val(data.message.department_name);
-                $("#subdepartment_name").val(data.message.subdepartment_name);
-                $("#taluka_name").val(data.message.taluka_name);
-                $("#status").val(data.message.status);
+            data: {
+                id: btoa(id)
             },
-            error:function(jqXHR,textStatus,errorThrown){
+            dataType: "JSON",
+            success: function(data) {
+                if (data.status) {
+                    $("#id").val(data.message.id);
+                    $("#name").val(data.message.name);
+                    $("#mobile_no").val(data.message.mobile_no);
+                    $("#email").val(data.message.email);
+                    $("#user_name").val(data.message.user_name);
+                    $("#role_name").val(data.message.role_name);
+                    $("#department_name").val(data.message.department_name);
+
+                    // Load subdepartments dynamically
+                    var deptId = data.message.department_name;
+                    $.ajax({
+                        url: "{{ url('/getSubdepartments') }}",
+                        type: "POST",
+                        data: {
+                            id: deptId,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            $('#subdepartment_name').empty().append('<option value="">Select Subdepartment</option>');
+                            $.each(response, function(key, value) {
+                                $('#subdepartment_name').append('<option value="' + value.id + '">' + value.subdepartment_name + '</option>');
+                            });
+                            $('#subdepartment_name').val(data.message.subdepartment_name);
+                        }
+                    });
+
+                    $("#taluka_name").val(data.message.taluka_name);
+                    $("#status").val(data.message.status);
+                    $("#addEditUserModal").modal('show'); // ✅ Show modal here
+                } else {
+                    swal.fire("Error", "User not found", "error");
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
                 alert("Error get data from ajax");
+            }
+        });
+    }
+
+    function deleteUser(id) {
+        swal.fire({
+            title: "Are you sure?",
+            text: "You will not able to recover the data",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            cancelButtonText: "Cancel",
+            confirmButtonText: "Yes,delete it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{{ url('deleteUserDetails') }}",
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    },
+                    data: {
+                        id: btoa(id)
+                    },
+                    success: function(data) {
+                        if (data.status) {
+                            swal.fire("Deleted!", data.message, "success");
+                            $("#userTable").DataTable().ajax.reload();
+                        } else {
+                            swal.fire("Error!", data.message, "error");
+                        }
+                    },
+                    error: function() {
+                        swal.fire("Error!", "Ajax error occured", "error");
+                    }
+                });
             }
         });
     }

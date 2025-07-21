@@ -18,6 +18,7 @@ class UserController extends Controller
         $data['department'] = Department::all();
         $data['subdepartment'] = Subdepartment::all();
         $data['taluka'] = Taluka::all();
+        $data['user'] = UserDetails::all();
         return view('admin/User', ['data' => $data]);
     }
 
@@ -40,7 +41,9 @@ class UserController extends Controller
                     $query->orderBy('id', 'asc');
                 })
                 ->addColumn('action', function ($row) {
-                    $btn = "<a title='Edit User' onClick=editUser($row->id) class='btn btn-primary btn-sm'><i class='fa fa-edit text-light'></i></a> <a title='Delete User' onClick=deleteUser($row->id) class='btn btn-danger btn-sm'><i class='fa fa-trash text-light' aria-hidden='true'></i></a>";
+
+
+                    $btn = "<a title='Edit User' onClick=editUser($row->id) class='btn btn-primary btn-xs py-1 px-2' id='editUser'><i class='fas fa-edit text-light'></i></a> <a title='Delete User' onClick=deleteUser($row->id) class='btn btn-danger btn-xs py-1 px-2' id='deleteUer'><i class='fas fa-trash text-light'></i></a>";
                     return $btn;
                 })
                 ->rawColumns(['action'])
@@ -91,7 +94,50 @@ class UserController extends Controller
         return response()->json($data);
     }
 
-    public function editUserDetails(Request $request){
-        $data=User
+    public function editUserDetails(Request $request)
+    {
+        $data = UserDetails::find(base64_decode($request->id));
+        if ($data) {
+            return response()->json(['status' => true, 'message' => $data, 'code' => 200]);
+        } else {
+            return response()->json(['status' => false, 'message' => "Data not found", 'code' => 500]);
+        }
+    }
+
+    public function updateUser(Request $request)
+    {
+        $data = UserDetails::find($request->id);
+        if (empty($data)) {
+            return response()->json(['status' => false, 'message' => "Record not found", 'code' => 500]);
+        }
+        $data->name = $request->name;
+        $data->mobile_no = $request->mobile_no;
+        $data->email = $request->email;
+        $data->user_name = $request->user_name;
+        $data->role_name = $request->role_name;
+        $data->department_name = $request->department_name;
+        $data->subdepartment_name = $request->subdepartment_name;
+        $data->taluka_name = $request->taluka_name;
+        $data->status = $request->status;
+
+        $result = $data->save();
+        if ($result) {
+            return response()->json(['status' => true, 'message' => "User has been updated successfully", 'code' => 200]);
+        } else {
+            return response()->json(['status' => false, 'message' => "Error while updating error", 'code' => 500]);
+        }
+    }
+
+    public function deleteUserDetails(Request $request)
+    {
+        $id = base64_decode($request->id);
+        $data = UserDetails::find($id);
+        $data->status = 2;
+        $result = $data->save();
+        if ($result) {
+            return response()->json(['status' => true, 'message' => "User has been deleted successfully", 'code' => 200]);
+        } else {
+            return response()->json(['status' => false, 'message' => "Error while deleting the user", 'code' => 500]);
+        }
     }
 }

@@ -88,3 +88,6 @@ Route::get("/user",[UserController::class,"user"]);
 Route::get("/userDatatable",[UserController::class,"userDatatable"]);
 Route::post("/saveUserDetails",[UserController::class,"saveUserDetails"]);
 Route::post('/getSubdepartments', [UserController::class, 'getSubdepartments']);
+Route::post('/editUserDetails', [UserController::class, 'editUserDetails']);
+Route::post('/updateUser', [UserController::class, 'updateUser']);
+Route::post('/deleteUserDetails', [UserController::class, 'deleteUserDetails']);
