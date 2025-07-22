@@ -64,6 +64,7 @@
                         <form class="addEditModuleForm" id="addEditModuleForm" method="post">
                             @csrf
                             <div class="row">
+                                <input type="hidden" id="id" name="id" class="form-control">
                                 <div class="col-md-12 form-group">
                                     <label for="module_name" class="form-label">Module Name</label>
                                     <input type="text" name="module_name" id="module_name" class="form-control">
@@ -86,7 +87,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-primary" onclick="saveModule()">Save</button>
                     </div>
                 </div>
             </div>
@@ -142,11 +143,119 @@
         });
     });
 
-    function addModule(id){
-        save_method='add';
+    function addModule(id) {
+        save_method = 'add';
         $("#addEditModuleForm")[0].reset();
         $("#addEditModuleModel").modal('show');
         $(".modal-title").text("Add module");
+    }
+
+    function saveModule(id) {
+        var module_name = $("#module_name").val();
+        var display_name = $("#display_name").val();
+        var status = $("#status").val();
+        var form=$("#addEditModuleForm")[0];
+        var formData= new FormData(form);
+        var url;
+
+        if(save_method=='add'){
+            url="saveModuleDetails";
+            msg="New module has been added successfully";
+        }
+        else{
+            url="updateModule";
+            msg="Module updated successfully";
+        }
+
+        $.ajax({
+            url:url,
+            type:"POST",
+            processData:false,
+            contentType:false,
+            data:formData,
+            dataType:"JSON",
+            success:function(data){
+                if(data.status){
+                    swal.fire("success",data.message,"success");
+                    $("#addEditModuleModel").modal('hide');
+                    $("#moduleTable").DataTable().ajax.reload();
+                }
+                else{
+                    swal.fire("error",data.message,"error");
+                }
+            },
+            error:function(jqXHR,textStatus,errorThrown){
+                swal.fire("error","Error adding/updation data","error");
+            }
+        });
+    }
+
+    function editModule(id){
+        save_method='update';
+        $("modal-title").text("Edit Module");
+        $("#addEditModuleForm")[0].reset();
+        $.ajax({
+            url:"editModuleDetails",
+            type:"POST",
+            headers:{
+                'X-CSRF-TOKEN':"{{ csrf_token() }}"
+            },
+            data:{
+                id:btoa(id)
+            },
+            dataType:"JSON",
+            success:function(data){
+                $("#id").val(data.message.id);
+                $("#module_name").val(data.message.module_name);
+                $("#display_name").val(data.message.display_name);
+                $("#status").val(data.message.status);
+
+                $("#addEditModuleModel").modal('show');
+                $(".modal-title").text("Edit Module");
+            },
+            error:function(jqXHR,textStatus,errorThrown){
+                alert("get data from ajax");
+            }
+        });
+    }
+
+
+    function deleteModule(id){
+        swal.fire({
+            title:"Are you sure?",
+            text:"You will not able to recover the data",
+            icon:"warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Delete is!",
+            cancelButtonText: "Cancel",
+
+        }).then((result)=>{
+            if(result.isConfirmed){
+                $.ajax({
+                    url:"{{ url('deleteModuleDetails') }}",
+                    type:"JSON",
+                    headers:{
+                        'X-CSRF-TOKEN':"{{ csrf_token() }}"
+                    },
+                    data:{
+                        id:btoa(id)
+                    },
+                    success:function(data){
+                        if(data.status){
+                            swal.fire("Deleted!",data.message,"success");
+                            $("#moduleTable").DataTable().ajax.reload();
+                        }
+                        else{
+                            swal.fire("Error",data.message,"error");
+                        }
+                    },
+                    error:function(){
+                        swal.fire("Error","Ajax error occured","error");
+                    }
+                })
+            }
+        })
     }
 </script>
 

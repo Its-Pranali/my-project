@@ -99,3 +99,7 @@ Route::post('/deleteUserDetails', [UserController::class, 'deleteUserDetails']);
 
 Route::get("/module",[ModuleController::class,"module"]);
 Route::get("/moduleDatatable",[ModuleController::class,"moduleDatatable"]);
+Route::post("/saveModuleDetails",[ModuleController::class,"saveModuleDetails"]);
+Route::post("/editModuleDetails",[ModuleController::class,"editModuleDetails"]);
+Route::post("/updateModule",[ModuleController::class,"updateModule"]);
+Route::post("/deleteModuleDetails",[ModuleController::class,"deleteModuleDetails"]);
