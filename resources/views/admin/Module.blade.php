@@ -154,57 +154,55 @@
         var module_name = $("#module_name").val();
         var display_name = $("#display_name").val();
         var status = $("#status").val();
-        var form=$("#addEditModuleForm")[0];
-        var formData= new FormData(form);
+        var form = $("#addEditModuleForm")[0];
+        var formData = new FormData(form);
         var url;
 
-        if(save_method=='add'){
-            url="saveModuleDetails";
-            msg="New module has been added successfully";
-        }
-        else{
-            url="updateModule";
-            msg="Module updated successfully";
+        if (save_method == 'add') {
+            url = "saveModuleDetails";
+            msg = "New module has been added successfully";
+        } else {
+            url = "updateModule";
+            msg = "Module updated successfully";
         }
 
         $.ajax({
-            url:url,
-            type:"POST",
-            processData:false,
-            contentType:false,
-            data:formData,
-            dataType:"JSON",
-            success:function(data){
-                if(data.status){
-                    swal.fire("success",data.message,"success");
+            url: url,
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: formData,
+            dataType: "JSON",
+            success: function(data) {
+                if (data.status) {
+                    swal.fire("success", data.message, "success");
                     $("#addEditModuleModel").modal('hide');
                     $("#moduleTable").DataTable().ajax.reload();
-                }
-                else{
-                    swal.fire("error",data.message,"error");
+                } else {
+                    swal.fire("error", data.message, "error");
                 }
             },
-            error:function(jqXHR,textStatus,errorThrown){
-                swal.fire("error","Error adding/updation data","error");
+            error: function(jqXHR, textStatus, errorThrown) {
+                swal.fire("error", "Error adding/updation data", "error");
             }
         });
     }
 
-    function editModule(id){
-        save_method='update';
+    function editModule(id) {
+        save_method = 'update';
         $("modal-title").text("Edit Module");
         $("#addEditModuleForm")[0].reset();
         $.ajax({
-            url:"editModuleDetails",
-            type:"POST",
-            headers:{
-                'X-CSRF-TOKEN':"{{ csrf_token() }}"
+            url: "editModuleDetails",
+            type: "POST",
+            headers: {
+                'X-CSRF-TOKEN': "{{ csrf_token() }}"
             },
-            data:{
-                id:btoa(id)
+            data: {
+                id: btoa(id)
             },
-            dataType:"JSON",
-            success:function(data){
+            dataType: "JSON",
+            success: function(data) {
                 $("#id").val(data.message.id);
                 $("#module_name").val(data.message.module_name);
                 $("#display_name").val(data.message.display_name);
@@ -213,45 +211,44 @@
                 $("#addEditModuleModel").modal('show');
                 $(".modal-title").text("Edit Module");
             },
-            error:function(jqXHR,textStatus,errorThrown){
+            error: function(jqXHR, textStatus, errorThrown) {
                 alert("get data from ajax");
             }
         });
     }
 
 
-    function deleteModule(id){
+    function deleteModule(id) {
         swal.fire({
-            title:"Are you sure?",
-            text:"You will not able to recover the data",
-            icon:"warning",
+            title: "Are you sure?",
+            text: "You will not able to recover the data",
+            icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
             confirmButtonText: "Yes, Delete it!",
             cancelButtonText: "Cancel",
 
-        }).then((result)=>{
-            if(result.isConfirmed){
+        }).then((result) => {
+            if (result.isConfirmed) {
                 $.ajax({
-                    url:"{{ url('deleteModuleDetails') }}",
-                    type:"POST",
-                    headers:{
-                        'X-CSRF-TOKEN':"{{ csrf_token() }}"
+                    url: "{{ url('deleteModuleDetails') }}",
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
                     },
-                    data:{
-                        id:btoa(id)
+                    data: {
+                        id: btoa(id)
                     },
-                    success:function(data){
-                        if(data.status){
-                            swal.fire("Deleted!",data.message,"success");
+                    success: function(data) {
+                        if (data.status) {
+                            swal.fire("Deleted!", data.message, "success");
                             $("#moduleTable").DataTable().ajax.reload();
-                        }
-                        else{
-                            swal.fire("Error",data.message,"error");
+                        } else {
+                            swal.fire("Error", data.message, "error");
                         }
                     },
-                    error:function(){
-                        swal.fire("Error","Ajax error occured","error");
+                    error: function() {
+                        swal.fire("Error", "Ajax error occured", "error");
                     }
                 })
             }

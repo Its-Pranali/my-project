@@ -56,11 +56,6 @@
         </div>
 
 
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addEditSubmoduleModal">
-            Launch demo modal
-        </button>
-
         <!-- Modal -->
         <div class="modal fade" id="addEditSubmoduleModal" tabindex="-1" role="dialog" aria-labelledby="addEditSubmoduleModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -72,13 +67,17 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form class="submoduleForm" id="submoduleForm">
+                        <form class="submoduleForm" id="submoduleForm" method="post">
                             @csrf
                             <div class="row">
+                                <input type="hidden" id="id" name="id">
                                 <div class="col-md-12 form-group">
                                     <label for="module_name" class="form-label">Module Name</label>
                                     <select name="module_name" id="module_name" class="form-control">
                                         <option value="">Select Module Name</option>
+                                        @foreach ($data['module'] as $key=>$module )
+                                        <option value="{{ $module['id'] }}">{{ $module['module_name'] }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
 
@@ -113,5 +112,135 @@
         </div>
     </div>
 </div>
+
+<script src="{{asset('/public/assets/plugins/jquery/jquery.min.js')}}"></script>
+
+<script>
+    $(document).ready(function() {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf_token"]').attr('content')
+            }
+        });
+
+        $("#submoduleTable").dataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ url('submoduleDatatable') }}",
+            lengthMenu: [
+                [25, 50, 100, 200, -1],
+                [25, 50, 100, 200, "All"],
+            ],
+            columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                },
+                {
+                    data: 'm_name',
+                    name: 'm.module_name',
+                },
+                {
+                    data: 'submodule_name',
+                    name: 'submodule_name',
+                },
+                {
+                    data: 'display_name',
+                    name: 'display_name',
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    data: function(row, type, value, meta) {
+                        if (row.status == 1) {
+                            return "Active";
+                        } else {
+                            return "Inactive";
+                        }
+                    }
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                }
+            ]
+        });
+    });
+
+
+    function addSubmodule(id) {
+        save_method = 'add';
+        $("#submoduleForm")[0].reset();
+        $("#addEditSubmoduleModal").modal('show');
+        $(".modal-title").text("Add Submodule")
+    }
+
+    function saveSubmodule(id) {
+        var module_name = $("#module_name").val();
+        var submodule_name = $("#submodule_name").val();
+        var display_name = $("#display_name").val();
+        var status = $("#status").val();
+        var form = $("#submoduleForm")[0];
+        var formData = new FormData(form);
+        var url;
+
+        if (save_method == 'add') {
+            url = "saveSubmoduleDetails";
+            msg = "New submodule has been saved successfully";
+        } else {
+            url = "updateSubmodule";
+            msg = "Submodule has been updated successfully";
+        }
+        $.ajax({
+            url: url,
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: formData,
+            dataType: "JSON",
+            success: function(data) {
+                if (data.status) {
+                    swal.fire("success", data.message, "success");
+                    $("#addEditSubmoduleModal").modal('hide');
+                    $("#submoduleTable").dataTable().ajax.reload();
+                } else {
+                    swal.fire("error", data.message, "error");
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                swal.fire("error", "Error adding/updating data", "error");
+            }
+        });
+    }
+
+    function editSubmodule(id) {
+        save_method = 'update';
+        $(".modal-title").text("Edit Submodule");
+        $("#submoduleForm")[0].reset();
+        $.ajax({
+            url: "editSubmoduleDetails",
+            type: "POST",
+            headers: {
+                'X-CSRF-TOKEN': "{{ csrf_token() }}"
+            },
+            data: {
+                id: btoa(id)
+            },
+            dataType: "JSON",
+            success: function(data) {
+                $("#id").val(data.message.id);
+                $("#module_name").val(data.message.module_name);
+                $("#submodule_name").val(data.message.submodule_name);
+                $("#display_name").val(data.message.display_name);
+                $("#status").val(data.message.status);
+
+                $("#addEditSubmoduleModal").modal('show');
+                $(".modal-title").text("Edit Submodule");
+            },
+            errors: function(jqXHR, textStatus, errorThrown) {
+                alert("Get data from ajax");
+            }
+        })
+    }
+</script>
 
 @endsection
