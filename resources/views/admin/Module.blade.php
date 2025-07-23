@@ -227,14 +227,14 @@
             icon:"warning",
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Yes, Delete is!",
+            confirmButtonText: "Yes, Delete it!",
             cancelButtonText: "Cancel",
 
         }).then((result)=>{
             if(result.isConfirmed){
                 $.ajax({
                     url:"{{ url('deleteModuleDetails') }}",
-                    type:"JSON",
+                    type:"POST",
                     headers:{
                         'X-CSRF-TOKEN':"{{ csrf_token() }}"
                     },

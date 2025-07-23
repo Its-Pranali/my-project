@@ -10,6 +10,7 @@ use App\Http\Controllers\FormController;
 use App\Http\Controllers\SubdepartmentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\SubmoduleController;
 
 Route::get('/', function () {
     return view('Dashboard');
@@ -103,3 +104,8 @@ Route::post("/saveModuleDetails",[ModuleController::class,"saveModuleDetails"]);
 Route::post("/editModuleDetails",[ModuleController::class,"editModuleDetails"]);
 Route::post("/updateModule",[ModuleController::class,"updateModule"]);
 Route::post("/deleteModuleDetails",[ModuleController::class,"deleteModuleDetails"]);
+
+
+// Route for Submodule
+
+Route::get("/submodule",[SubmoduleController::class,"submodule"]);
