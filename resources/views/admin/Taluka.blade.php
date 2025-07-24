@@ -219,7 +219,7 @@
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Yes, Delete is!",
+            confirmButtonText: "Yes, Delete it!",
             cancelButtonText: "Cancel",
         }).then((result) => {
             if (result.isConfirmed) {

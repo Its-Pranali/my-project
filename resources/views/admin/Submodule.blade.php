@@ -201,7 +201,7 @@
                 if (data.status) {
                     swal.fire("success", data.message, "success");
                     $("#addEditSubmoduleModal").modal('hide');
-                    $("#submoduleTable").dataTable().ajax.reload();
+                    $("#submoduleTable").DataTable().ajax.reload();
                 } else {
                     swal.fire("error", data.message, "error");
                 }
@@ -236,10 +236,46 @@
                 $("#addEditSubmoduleModal").modal('show');
                 $(".modal-title").text("Edit Submodule");
             },
-            errors: function(jqXHR, textStatus, errorThrown) {
+            error: function(jqXHR, textStatus, errorThrown) {
                 alert("Get data from ajax");
             }
-        })
+        });
+    }
+
+    function deleteSubmodule(id) {
+        swal.fire({
+            title: "Are you sure?",
+            text: "You will not able to recover the data",
+            showCancelButton: true,
+            icon: "warning",
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Delete it!",
+            cancelButtonText: "Cancel",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{{ url('deleteSubmoduleDetails') }}",
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    },
+                    data: {
+                        id: btoa(id)
+                    },
+                    success: function(data) {
+                        if (data.status) {
+                            swal.fire("Deleted!", data.message, "success");
+                            $('#submoduleTable').DataTable().ajax.reload();
+                        } else {
+                            swal.fire("Error!", data.message, "error");
+                        }
+                    },
+                    error: function() {
+                        swal.fire("Error!", "Ajax Error Occured", "error");
+                    }
+                });
+            }
+        });
     }
 </script>
 

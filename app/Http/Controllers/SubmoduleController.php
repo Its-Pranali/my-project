@@ -89,4 +89,17 @@ class SubmoduleController extends Controller
             return response(['status' => false, 'message' => "Error while updating the submodule", 'code' => 500]);
         }
     }
+
+    public function deleteSubmoduleDetails(Request $request){
+        $id=base64_decode($request->id);
+        $data=Submodule::find($id);
+        $data->status=2;
+        $result=$data->save();
+        if($result){
+            return response()->json(['status'=>true,'message'=>"Submodule has been deleted successfully",'code'=>200]);
+        }
+        else{
+            return response()->json(['status'=>false,'message'=>"Error while delete the submodule",'code'=>500]);
+        }
+    }
 }

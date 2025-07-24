@@ -113,3 +113,4 @@ Route::get("/submoduleDatatable",[SubmoduleController::class,"submoduleDatatable
 Route::post("/saveSubmoduleDetails",[SubmoduleController::class,"saveSubmoduleDetails"]);
 Route::post("/editSubmoduleDetails",[SubmoduleController::class,"editSubmoduleDetails"]);
 Route::post("/updateSubmodule",[SubmoduleController::class,"updateSubmodule"]);
+Route::post("/deleteSubmoduleDetails",[SubmoduleController::class,"deleteSubmoduleDetails"]);

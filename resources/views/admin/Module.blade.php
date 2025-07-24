@@ -250,9 +250,9 @@
                     error: function() {
                         swal.fire("Error", "Ajax error occured", "error");
                     }
-                })
+                });
             }
-        })
+        });
     }
 </script>
 
